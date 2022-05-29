@@ -1,6 +1,8 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-// const AuthorizationError = require('../errors/AuthorizationError');
-// const ConflictError = require('../errors/ConflictError');
+const AuthorizationError = require('../errors/AuthorizationError');
+const ConflictError = require('../errors/ConflictError');
 // const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
@@ -41,7 +43,50 @@ const getMe = (req, res, next) => {
     });
 };
 
+const createUser = (req, res, next) => {
+  const {
+    email, password, name,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email, password: hash, name,
+    }))
+    .then((user) => {
+      res.status(200).send({
+        user: {
+          email: user.email,
+          name: user.name,
+        },
+      });
+    })
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким EMAIL уже зарегистрирован'));
+      } else if (err.name === 'CastError') {
+        next(new BadRequestError('Переданны некорректные данные'));
+      } else {
+        next(err);
+      }
+    });
+};
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+
+      // вернём токен
+      res.status(200).send({ token });
+    })
+    .catch((err) => {
+      next(new AuthorizationError(err.message));
+    });
+};
+
 module.exports = {
   updateProfile,
   getMe,
+  createUser,
+  login,
 };
