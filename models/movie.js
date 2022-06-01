@@ -52,18 +52,17 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
 
-  movieId: { // _id пользователя, который сохранил фильм
-    type: mongoose.Schema.Types.ObjectId,
-    // ref: 'user',
+  movieId: { // _id фильма
+    type: Number,
     required: true,
   },
 
-  nameRu: { // название фильма на русском языке
+  nameRU: { // название фильма на русском языке
     type: String,
     required: true,
   },
 
-  nameEn: { // название фильма на английском языке
+  nameEN: { // название фильма на английском языке
     type: String,
     required: true,
   },

@@ -1,8 +1,10 @@
 const express = require('express');
-const { celebrate, Joi } = require('celebrate');
 const mongoose = require('mongoose');
-const errorHandler = require('./middlewares/error');
+const { celebrate, Joi, errors } = require('celebrate');
+const bodyParser = require('body-parser');
 const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/error');
 const NotFoundError = require('./errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
@@ -11,6 +13,8 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
+app.use(bodyParser.json()); // для собирания JSON-формата
+app.use(bodyParser.urlencoded({ extended: true })); // для приёма веб-страниц внутри POST-запроса
 mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
   useNewUrlParser: true,
   // useCreateIndex: true,
@@ -34,6 +38,8 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
+app.use(auth);
+
 app.use('/users', require('./routes/users'));
 app.use('/movies', require('./routes/movies'));
 
@@ -41,6 +47,7 @@ app.use((req, res, next) => next(new NotFoundError('Страница не най
 
 app.use(errorLogger);
 
+app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {
