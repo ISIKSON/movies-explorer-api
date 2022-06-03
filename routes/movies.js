@@ -7,9 +7,9 @@ const {
   deleteMovie,
 } = require('../controllers/movies');
 
-router.get('/', getMovies);
+router.get('/movies', getMovies);
 
-router.post('/', celebrate({
+router.post('/movies', celebrate({
   body: Joi.object().keys({
     country: Joi.string().required().min(2).max(30),
     director: Joi.string().required().min(2).max(30),
@@ -31,9 +31,9 @@ router.post('/', celebrate({
   }),
 }), createMovie);
 
-router.delete('/:deleteId', celebrate({
+router.delete('/movies/:likeMovieId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().length(24).hex().required(),
+    likeMovieId: Joi.string().length(24).hex().required(),
   }),
 }), deleteMovie);
 

@@ -50,13 +50,13 @@ const createMovie = (req, res, next) => {
 };
 
 const deleteMovie = (req, res, next) => {
-  Movie.findById(req.params.movieId)
+  Movie.findById(req.params.likeMovieId)
     .orFail(() => new NotFoundError('Фильм с указанным _id не найден'))
     .then((movie) => {
       if (movie.owner._id.toString() !== req.user._id.toString()) {
         throw new ForbiddenError('Нельзя удалить избранный фильм другого пользователя');
       }
-      Movie.findByIdAndRemove(req.params.movieId)
+      Movie.findByIdAndRemove(req.params.likeMovieId)
         .then((movieData) => {
           res.status(200).send({ data: movieData });
         })

@@ -20,7 +20,9 @@ const updateProfile = (req, res, next) => {
       return res.status(200).send({ _id: user._id, name, email });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.code === 11000) {
+        next(new ConflictError('Данный EMAIL уже занят. Попробуйте ввести другой.'));
+      } else if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные профиля'));
       } else {
         next(err);
@@ -80,7 +82,8 @@ const login = (req, res, next) => {
       const token = jwt.sign(
         { _id: user._id },
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-        { expiresIn: '7d' });
+        { expiresIn: '7d' },
+      );
 
       // вернём токен
       res.status(200).send({ token });
