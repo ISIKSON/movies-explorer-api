@@ -18,8 +18,8 @@ const allowedCors = [
   'http://praktikum.tk',
   'localhost:3000',
   'http://localhost:3000',
-  'https://mesto-islam.students.nomoredomains.xyz',
-  'http://mesto-islam.students.nomoredomains.xyz',
+  'https://movie-islam.students.nomoreparties.sbs',
+  'http://movie-islam.students.nomoreparties.sbs',
 ];
 
 app.use(bodyParser.json()); // для собирания JSON-формата
